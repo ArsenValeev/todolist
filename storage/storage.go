@@ -2,7 +2,11 @@ package storage
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"study/models"
+
+	
 )
 
 
@@ -64,12 +68,39 @@ func (s *Storage) UpdateTask(id int, title, description string) *models.Task {
 }
 
 func (s *Storage) TaskCompleted(id int)*models.Task{
-	if task, exist := s.tasks[id]; exist{
-		task.Completed = true
-		return task
+	if _, exist := s.tasks[id]; exist{
+		s.tasks[id].Completed = true
+		return s.tasks[id]
 	} else{
 		fmt.Println("Прозошла ошибка, не смогли обноваить стату задачи")
 		return nil
 	}
 }
 
+
+func (s *Storage) GetTaskWithFilter(completed, title string) []*models.Task{
+	mapTasks := s.tasks 
+	result := []*models.Task{}
+	
+	for _, task := range mapTasks{
+		matches := false
+		if completed != ""{
+			comp, err := strconv.ParseBool(completed)
+			if err != nil{
+				fmt.Println("Ошибка конвертации в булевое значение")
+			}
+			if task.Completed == comp{
+				matches = true
+			}
+		}
+
+		if title != "" && strings.Contains(strings.ToLower(task.Title), strings.ToLower(title)){
+			matches = true
+		}
+
+		if matches{
+			result = append(result, task)
+		}
+	}
+	return  result
+}

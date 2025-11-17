@@ -45,9 +45,23 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request){
-	task := t.storage.GetAllTasks()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(task)
+	if r.URL.RawQuery != ""{
+		completedFilter := r.URL.Query().Get("completed")
+		search := r.URL.Query().Get("search")
+	
+		filteredTasks := t.storage.GetTaskWithFilter(completedFilter, search)
+	
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(filteredTasks)	
+	} else{
+
+		task := t.storage.GetAllTasks()
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(task)
+	}
+
+	
+
 }
 
 func (t *TaskHandler) GetTaskId(w http.ResponseWriter, r *http.Request){
@@ -110,25 +124,13 @@ func (t *TaskHandler) UpdateTaskById(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func (t *TaskHandler) TaskCompletedByID(w http.ResponseWriter, r *http.Request){
+func (t *TaskHandler) TaskCompletedByID(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(r.URL.Path, "/")
 	idStr := parts[len(parts) - 1]
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil{
 		fmt.Println("Ошибка чтения id")
-	}
-
-	body, err := io.ReadAll(r.Body)
-
-	if err != nil{
-		http.Error(w, "Ошибка чтения", http.StatusBadRequest)
-	}
-
-	var request models.CreateTaskRequest
-	err = json.Unmarshal(body, &request)
-	if err != nil{
-		fmt.Println("Неверный JSON")
 	}
 
 	task := t.storage.TaskCompleted(id)
@@ -138,5 +140,6 @@ func (t *TaskHandler) TaskCompletedByID(w http.ResponseWriter, r *http.Request){
 
 	w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(task)
+
 	
 }

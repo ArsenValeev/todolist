@@ -19,6 +19,8 @@ func SetupRoutes() {
         taskHandler.GetTaskId(w, r)
     case "PUT":
         taskHandler.UpdateTaskById(w, r)
+    case "PATCH":
+        taskHandler.TaskCompletedByID(w, r)
     }
 })
 
