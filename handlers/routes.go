@@ -3,24 +3,25 @@ package handlers
 import "net/http"
 
 func SetupRoutes() {
-	taskHandler := NewTaskHandler()
+	// taskHandler := NewTaskHandler()
+    taskHandlerMySQL := NewtaskHandlerMySQL()
 
 	http.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
     switch r.Method {
     case "GET":
-        taskHandler.GetTasks(w, r)
+        taskHandlerMySQL.GetAllBD(w, r)
     case "POST":
-        taskHandler.CreateTask(w, r)
+        taskHandlerMySQL.CreateTaskDB(w, r)
     }
 	})
 	http.HandleFunc("/tasks/", func(w http.ResponseWriter, r *http.Request) {
     switch r.Method {
     case "GET":
-        taskHandler.GetTaskId(w, r)
-    case "PUT":
-        taskHandler.UpdateTaskById(w, r)
-    case "PATCH":
-        taskHandler.TaskCompletedByID(w, r)
+        taskHandlerMySQL.GetTaskDBbyID(w, r)
+    case "DELETE":
+        taskHandlerMySQL.DeleteTaskDB(w, r)
+    // case "PATCH":
+    //     taskHandler.TaskCompletedByID(w, r)
     }
 })
 

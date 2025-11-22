@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"strings"
 	"study/models"
-
-	
 )
 
 
@@ -61,7 +59,7 @@ func (s *Storage) UpdateTask(id int, title, description string) *models.Task {
     if _, exists := s.tasks[id]; exists {
         // Обновляем поля
         s.tasks[id].Title = title
-        s.tasks[id].Description = description
+        s.tasks[id].TaskDesc = description
         return s.tasks[id]
     }
     return nil // Задача не найдена

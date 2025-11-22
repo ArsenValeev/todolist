@@ -5,7 +5,7 @@ import "time"
 type Task struct {
 	ID          int `json:"id"`
 	Title       string `json:"title"`
-	Description string `json:"description"`
+	TaskDesc string `json:"taskDesc"`
 	Completed   bool `json:"completed"`
 	CreatedAt   time.Time `json:"createdAt"`
 }
@@ -14,7 +14,7 @@ type Task struct {
 func NewTask(title, description string) *Task{
 	return &Task{
 		Title: title,
-		Description: description,
+		TaskDesc: description,
 		CreatedAt: time.Now(),
 	}
 }
