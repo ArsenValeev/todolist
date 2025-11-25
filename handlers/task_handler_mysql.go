@@ -35,7 +35,7 @@ func (t *taskHandlerMySQL) CreateTaskDB(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 	
-	task := t.db.AddTask(request.Title, request.Description)
+	task := t.db.AddTask(request.Title, request.TaskDesc)
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -78,3 +78,29 @@ func (t *taskHandlerMySQL) DeleteTaskDB(w http.ResponseWriter, r *http.Request){
 	}
 	t.db.DeleteTaskBD(id)
 }
+
+func (t *taskHandlerMySQL) UpdateDBbyID(w http.ResponseWriter, r *http.Request){
+	str := strings.Split(r.URL.Path, "/")
+	id, err := strconv.Atoi(str[len(str) - 1])
+	if err != nil{
+		panic(err)
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil{
+		panic(err)
+	}
+	var stor models.CreateTaskRequest
+	err = json.Unmarshal(body, &stor)
+
+	if err != nil{
+		panic(err)
+	}
+
+	
+	task := t.db.UpdateByIDBD(stor.Title, stor.TaskDesc, id)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(task)
+}
+

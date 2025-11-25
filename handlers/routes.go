@@ -20,8 +20,10 @@ func SetupRoutes() {
         taskHandlerMySQL.GetTaskDBbyID(w, r)
     case "DELETE":
         taskHandlerMySQL.DeleteTaskDB(w, r)
-    // case "PATCH":
-    //     taskHandler.TaskCompletedByID(w, r)
+    case "PATCH":
+        taskHandlerMySQL.CompletedTask(w, r)
+    case "PUT":
+        taskHandlerMySQL.UpdateDBbyID(w, r)
     }
 })
 

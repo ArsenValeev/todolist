@@ -36,7 +36,7 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 
-	task := t.storage.AddTask(request.Title, request.Description)
+	task := t.storage.AddTask(request.Title, request.TaskDesc)
 	
 	w.Header().Set("Content-Type", "application/json")
 
@@ -110,10 +110,10 @@ func (t *TaskHandler) UpdateTaskById(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-	fmt.Println(request.Title, request.Description)
+	fmt.Println(request.Title, request.TaskDesc)
 
     // ОБНОВЛЯЕМ задачу, а не создаем новую!
-    task := t.storage.UpdateTask(id, request.Title, request.Description)
+    task := t.storage.UpdateTask(id, request.Title, request.TaskDesc)
     if task == nil {
         http.Error(w, "Задача не найдена", http.StatusNotFound)
         return
@@ -142,4 +142,17 @@ func (t *TaskHandler) TaskCompletedByID(w http.ResponseWriter, r *http.Request) 
     json.NewEncoder(w).Encode(task)
 
 	
+}
+
+func (t *taskHandlerMySQL) CompletedTask(w http.ResponseWriter, r *http.Request){
+	str := strings.Split(r.URL.Path, "/")
+	id, err := strconv.Atoi(str[len(str) - 1])
+	if err != nil{
+		panic(err)
+	}
+
+	task := t.db.CompletedbyID(id)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(task)
 }

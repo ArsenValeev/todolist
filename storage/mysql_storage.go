@@ -101,3 +101,50 @@ func (m *MySQLStorage) DeleteTaskBD(id int){
 	quary := "DELETE FROM tasks WHERE id = ?"
 	m.db.Exec(quary, id)
 }
+
+
+func (m *MySQLStorage) UpdateByIDBD(title, task_desk string, id int) *models.Task{
+
+	cur := m.GetTaskByIDDB(id)
+	if cur == nil{
+		return nil
+	}
+
+	query := "UPDATE tasks SET title = ?, task_desc = ? WHERE id = ?"
+	_, err := m.db.Exec(query, title, task_desk, id)
+	if err != nil{
+		panic(err)
+	}
+	
+	
+	return &models.Task{
+		ID: id,
+		Title: title,
+		TaskDesc: task_desk,
+		Completed: cur.Completed,
+		CreatedAt: cur.CreatedAt,
+	}
+}
+
+
+func (m *MySQLStorage) CompletedbyID(id int) *models.Task{
+	quary := "UPDATE tasks SET Completed = true WHERE id = ?"
+
+
+	cur := m.GetTaskByIDDB(id)
+	if cur == nil{
+		return nil
+	}
+	_, err := m.db.Exec(quary, id)
+	if err != nil{
+		panic(err)
+	}
+
+	return &models.Task{
+		ID: cur.ID,
+		Title: cur.Title,
+		TaskDesc: cur.TaskDesc,
+		Completed: true,
+		CreatedAt: cur.CreatedAt,
+	}
+}
