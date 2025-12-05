@@ -21,31 +21,43 @@ func NewtaskHandlerMySQL() *taskHandlerMySQL{
 	}
 }
 
-func (t *taskHandlerMySQL) CreateTaskDB(w http.ResponseWriter, r *http.Request){
-	body, err := io.ReadAll(r.Body)
-	if err != nil{
-		fmt.Println("Ошибка чтения запроса")
-	}
+func (t *taskHandlerMySQL) CreateTaskDB(w http.ResponseWriter, r *http.Request) {
+    userIDStr := r.Header.Get("User-ID")
+    if userIDStr == "" {
+        http.Error(w, "User not authenticated", http.StatusUnauthorized)
+        return
+    }
+
+    userID, err := strconv.Atoi(userIDStr)
+    if err != nil {
+		fmt.Println(userID, err)
+        http.Error(w, "Invalid user ID", http.StatusBadRequest)
+        return
+    }
+
+   
+    var req models.CreateTaskRequest
+    err = json.NewDecoder(r.Body).Decode(&req)
+    if err != nil {
+        http.Error(w, "Invalid JSON", http.StatusBadRequest)
+        return
+    }
 
 
-	var request models.CreateTaskRequest
-	err = json.Unmarshal(body, &request)
-	if err != nil{
-		fmt.Println("Ошибка чтеняи json", err)
-		return 
-	}
-	
-	task := t.db.AddTask(request.Title, request.TaskDesc)
+    task := t.db.AddTask(req.Title, req.TaskDesc, userID)
 
-	w.Header().Set("Content-Type", "application/json")
 
-	json.NewEncoder(w).Encode(task)
-
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(task)
 }
 
 func (t *taskHandlerMySQL) GetAllBD(w http.ResponseWriter, r *http.Request){
+	userIDStr := r.Header.Get("User-ID")
+	userID, _ := strconv.Atoi(userIDStr)
 
-	tasks := t.db.GetAllTaskBD()
+
+
+	tasks := t.db.GetTasksByUderID(userID)
 
 	w.Header().Set("Content-Type", "application/json")
 
