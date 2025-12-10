@@ -1,6 +1,5 @@
 package main
 
-
 import (
 	"net/http"
 	"study/handlers"
@@ -16,8 +15,5 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 
 }
-
-
-
 
 
